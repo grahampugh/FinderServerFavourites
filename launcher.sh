@@ -44,4 +44,4 @@ echo "Mode: $mode"
 echo "Servers: ${server[*]}"
 
 # now call the script
-"$relocatable_python_path" "$workdir/FinderServerFavourites.py" "$user" "$mode" "${server[@]}"
+"$relocatable_python_path" "$workdir/FinderServerFavourites.py" --user "$user" --mode "$mode" "${server[@]}"

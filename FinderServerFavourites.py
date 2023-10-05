@@ -10,38 +10,32 @@ Parameter 2: add or remove
 Parameter 3+: a list of servers
 """
 
-
+import argparse
 import os
 import subprocess
 import uuid
 import sys
 import Foundation
 
-user = sys.argv[1]
-user_home = (
-    subprocess.check_output(
-        [
-            "/usr/bin/dscl",
-            ".",
-            "read",
-            "/Users/{user}".format(user=user),
-            "NFSHomeDirectory",
-        ]
+def get_args():
+    """Parse any command line arguments"""
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "url", nargs="+", help="URL to add to the Finder favourites.",
     )
-    .decode()
-    .split(":")[1]
-    .strip()
-)
-favorites_path = os.path.join(
-    user_home,
-    "Library",
-    "Application Support",
-    "com.apple.sharedfilelist",
-    "com.apple.LSSharedFileList.FavoriteServers.sfl2",
-)
-
-mode = sys.argv[2][0:3].lower()
-servers = [s for s in sys.argv[3:] if s is not None and s != ""]
+    parser.add_argument(
+        "--mode",
+        default="add",
+        help="Which Seed Program catalog to use. Valid values "
+        "are 'add' and 'remove'. Default is 'add'.",
+    )
+    parser.add_argument(
+        "--user",
+        default="",
+        help="User to add the favourites to. Deafult is the current user.",
+    )
+    args = parser.parse_args()
+    return args
 
 
 def write_to_sfl2(servers):
@@ -158,20 +152,51 @@ def remove_favorites(servers):
     write_to_sfl2(all_servers)
 
 
+
 if __name__ == "__main__":
+    ## MAIN
+    args = get_args()
+
+    current_user = args.user
+    print(current_user)
+    user_home = (
+        subprocess.check_output(
+            [
+                "/usr/bin/dscl",
+                ".",
+                "read",
+                f"/Users/{current_user}",
+                "NFSHomeDirectory",
+            ]
+        )
+        .decode()
+        .split(":")[1]
+        .strip()
+    )
+    favorites_path = os.path.join(
+        user_home,
+        "Library",
+        "Application Support",
+        "com.apple.sharedfilelist",
+        "com.apple.LSSharedFileList.FavoriteServers.sfl2",
+    )
+
+    mode = args.mode
+    servers = [s for s in args.url if s is not None and s != ""]
+
     try:
         if mode == "add":
             add_favorites(servers)
-            print("Added servers for " + user)
+            print("Added servers for " + current_user)
         elif mode == "remove":
             remove_favorites(servers)
-            print("Removed servers for " + user)
+            print("Removed servers for " + current_user)
         else:
             print("No valid mode was selected. Please use ADD/REMOVE")
             exit(1)
 
         if os.path.exists(favorites_path):
-            os.system(("chown {user}:staff '".format(user=user) + favorites_path + "'"))
+            os.system((f"chown {current_user}:staff '" + favorites_path + "'"))
             os.system(("chmod 644 '" + favorites_path + "'"))
         else:
             print("Favorites file was not found.")
