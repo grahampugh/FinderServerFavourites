@@ -12,6 +12,15 @@ workdir="/Library/Management/FinderServerFavourites"
 # bundled python directory
 relocatable_python_path="$workdir/Python.framework/Versions/Current/bin/python3"
 
+# functions
+show_help() {
+    echo <<HELP
+Use this script to run FinderServerFavourites.py directly from the shell. Requires installation from the provided package.
+
+Usage: ./launcher.sh [--add|--remove] [--user] [--server] ([--server]...)
+HELP
+}
+
 # obtain arguments
 while test $# -gt 0 ; do
     case "$1" in
@@ -27,7 +36,9 @@ while test $# -gt 0 ; do
             shift
             server+=("$1")
             ;;
-        -h|--help) show_help
+        -h|--help) 
+            show_help
+            exit
             ;;
     esac
     shift

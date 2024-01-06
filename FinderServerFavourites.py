@@ -17,11 +17,16 @@ import uuid
 import sys
 import Foundation
 
+__version__ = "1.2"
+
+
 def get_args():
     """Parse any command line arguments"""
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "url", nargs="+", help="URL to add to the Finder favourites.",
+        "url",
+        nargs="+",
+        help="URL to add to the Finder favourites.",
     )
     parser.add_argument(
         "--mode",
@@ -152,13 +157,13 @@ def remove_favorites(servers):
     write_to_sfl2(all_servers)
 
 
-
 if __name__ == "__main__":
     ## MAIN
     args = get_args()
 
+    print(f"Running FinderServerFavourites.py version {__version__}")
+
     current_user = args.user
-    print(current_user)
     user_home = (
         subprocess.check_output(
             [

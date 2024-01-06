@@ -34,3 +34,4 @@ clean :
 	@echo "Cleaning up package root"
 	rm -Rf "$(PKG_ROOT)/Library/Management/FinderServerFavourites/"* ||:
 	rm $(PKG_BUILD)/*.pkg ||:
+	rm -Rf /Users/$(USER)/Library/Python/3.9/lib/python/site-packages
